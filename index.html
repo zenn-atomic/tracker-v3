@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tracker</title>
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        padding: 20px;
+      }
+
+      /* SPLASH SCREEN */
+
+      #loadingScreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        z-index: 9999;
+      }
+
+      .logo {
+        width: 120px;
+        height: 120px;
+        border-radius: 30px;
+        margin-bottom: 20px;
+      }
+
+      #loadingScreen h2 {
+        margin-top: 10px;
+        margin-bottom: 15px;
+      }
+
+      /* Garis loading */
+
+      .loadingBar {
+        width: 220px;
+        height: 6px;
+
+        background: rgba(255, 255, 255, 0.3);
+
+        border-radius: 30px;
+
+        overflow: hidden;
+      }
+
+      .loadingFill {
+        height: 100%;
+        width: 0%;
+
+        background: white;
+
+        border-radius: 30px;
+
+        animation: loading 3s linear forwards;
+      }
+
+      @keyframes loading {
+        0% {
+          width: 0%;
+        }
+
+        100% {
+          width: 100%;
+        }
+      }
+
+      #mainContent {
+        display: none;
+      }
+
+      /* APP */
+
+      .card {
+        max-width: 700px;
+        margin: auto;
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 15px;
+        color: #2a5298;
+      }
+
+      .box {
+        background: #f4f6fa;
+        padding: 12px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+      }
+
+      .value {
+        font-size: 22px;
+        font-weight: bold;
+      }
+
+      #map {
+        height: 350px;
+        border-radius: 12px;
+        margin: 15px 0;
+      }
+
+      .buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        padding: 10px 14px;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .start {
+        background: #28a745;
+      }
+
+      .stop {
+        background: #dc3545;
+      }
+
+      .reset {
+        background: #007bff;
+      }
+
+      .routeBtn {
+        background: #fd7e14;
+        width: 100%;
+        margin-top: 5px;
+      }
+
+      .routeItem {
+        background: #eef2ff;
+        padding: 10px;
+        border-radius: 10px;
+        margin-top: 8px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        margin-bottom: 15px;
+      }
+
+      #profileBtn {
+        width: 50px;
+        height: 50px;
+
+        border-radius: 50%;
+        cursor: pointer;
+
+        object-fit: cover;
+
+        border: 3px solid #ffffff;
+
+        box-shadow: 0 0 10px rgba(3, 3, 3, 0.4);
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- SPLASH -->
+
+    <div id="loadingScreen">
+      <img src="img/logo.png" class="logo" />
+
+      <h2>Tracker</h2>
+
+      <div class="loadingBar">
+        <div class="loadingFill"></div>
+      </div>
+    </div>
+
+    <!-- APP -->
+
+    <div id="mainContent">
+      <div class="card">
+        <div class="header">
+          <h1>Tracker</h1>
+
+          <img
+            id="profileBtn"
+            src="img/default-profile.png"
+            onclick="window.location.href = 'pages/profile.html'"
+          />
+        </div>
+
+        <div class="box">
+          <small>Jarak Tempuh</small>
+          <div class="value" id="distance">0.00 KM</div>
+        </div>
+
+        <div class="box">
+          <small>Kecepatan Saat Ini</small>
+          <div class="value" id="speed">0.0 KM/J</div>
+        </div>
+
+        <div class="box">
+          <small>Kecepatan Maksimum</small>
+          <div class="value" id="maxSpeed">0.0 KM/J</div>
+        </div>
+
+        <div class="box">
+          <small>Waktu Bergerak</small>
+          <div class="value" id="timer">00:00:00</div>
+        </div>
+
+        <div id="map"></div>
+
+        <div class="buttons">
+          <button class="start" onclick="startTracking()">Mulai</button>
+
+          <button class="stop" onclick="stopTracking()">Simpan</button>
+
+          <button class="reset" onclick="resetData()">Reset</button>
+        </div>
+
+        <div id="routesList"></div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+      /* CEK LOGIN */
+
+      document.addEventListener("DOMContentLoaded", () => {
+        if (localStorage.getItem("isLogin") != "true") {
+          window.location.href = "pages/login.html";
+          return;
+        }
+
+        /* Splash loading */
+
+        setTimeout(() => {
+          document.getElementById("loadingScreen").style.display = "none";
+
+          document.getElementById("mainContent").style.display = "block";
+
+          setTimeout(() => {
+            map.invalidateSize();
+          }, 100);
+        }, 3000);
+      });
+
+      /* MAP */
+
+      const key = "Ztg8csQW79ZcAtBGN9IF";
+
+      const map = L.map("map").setView([-7.39, 109.36], 13);
+
+      if (localStorage.getItem("profileImage")) {
+        document.getElementById("profileBtn").src =
+          localStorage.getItem("profileImage");
+      }
+
+      L.tileLayer(
+        `https://api.maptiler.com/maps/hybrid-v4/{z}/{x}/{y}.jpg?key=${key}`,
+        {
+          tileSize: 512,
+          zoomOffset: -1,
+          minZoom: 1,
+          maxZoom: 20,
+        },
+      ).addTo(map);
+      let marker;
+      let pathLine;
+      let pathCoords = [];
+      let lastLat = null;
+      let lastLng = null;
+      let isMoving = false;
+      let movingTimerInterval;
+      let totalDistance = 0;
+
+      pathLine = L.polyline([], { color: "blue" }).addTo(map);
+
+      /* Demo */
+
+      let movingSeconds = 0;
+
+      let timerInterval;
+
+      function startTracking() {
+        startGPS();
+
+        movingSeconds = 0;
+        clearInterval(timerInterval);
+        clearInterval(movingTimerInterval);
+
+        movingTimerInterval = setInterval(() => {
+          if (isMoving) {
+            movingSeconds++;
+
+            let h = Math.floor(movingSeconds / 3600);
+            let m = Math.floor((movingSeconds % 3600) / 60);
+            let s = movingSeconds % 60;
+
+            document.getElementById("timer").textContent =
+              String(h).padStart(2, "0") +
+              ":" +
+              String(m).padStart(2, "0") +
+              ":" +
+              String(s).padStart(2, "0");
+          }
+        }, 1000);
+
+        alert("Tracking dimulai");
+      }
+
+      function stopTracking() {
+        stopGPS();
+        let routes = JSON.parse(localStorage.getItem("routes") || "[]");
+
+        routes.push({
+          distance:
+            parseFloat(document.getElementById("distance").textContent) || 0,
+
+          duration: movingSeconds || 0,
+
+          maxSpeed:
+            parseFloat(document.getElementById("maxSpeed").textContent) || 0,
+
+          date: new Date(),
+        });
+
+        localStorage.setItem(
+          "routes",
+
+          JSON.stringify(routes),
+        );
+
+        clearInterval(timerInterval);
+
+        alert("Perjalanan disimpan");
+      }
+
+      function resetData() {
+        document.getElementById("distance").textContent = "0.00 KM";
+
+        document.getElementById("speed").textContent = "0.0 KM/J";
+
+        document.getElementById("maxSpeed").textContent = "0.0 KM/J";
+
+        document.getElementById("timer").textContent = "00:00:00";
+      }
+      let watchId;
+
+      function startGPS() {
+        if (!navigator.geolocation) {
+          alert("GPS tidak didukung");
+          return;
+        }
+
+        watchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            let lat = pos.coords.latitude;
+            let lng = pos.coords.longitude;
+            let speed = pos.coords.speed; // m/s dari GPS (kalau ada)
+
+            let newLatLng = [lat, lng];
+
+            // marker
+            if (!marker) {
+              marker = L.marker(newLatLng).addTo(map);
+              map.setView(newLatLng, 17);
+            } else {
+              marker.setLatLng(newLatLng);
+            }
+
+            // =========================
+            // 📏 HITUNG JARAK REALTIME
+            // =========================
+            if (lastLat !== null) {
+              let distance = getDistanceFromLatLonInM(
+                lastLat,
+                lastLng,
+                lat,
+                lng,
+              );
+
+              // filter noise GPS (biar gak loncat kecil)
+              if (distance > 2) {
+                totalDistance += distance;
+              }
+            }
+
+            lastLat = lat;
+            lastLng = lng;
+
+            // tampilkan KM
+            document.getElementById("distance").textContent =
+              (totalDistance / 1000).toFixed(2) + " KM";
+
+            // =========================
+            // 🚀 SPEED REAL TIME
+            // =========================
+            let currentSpeed = 0;
+
+            if (speed && speed > 0) {
+              currentSpeed = speed * 3.6; // m/s → km/h
+            } else if (lastLat !== null) {
+              // fallback dari pergerakan manual
+              currentSpeed = (distance ? distance / 1000 : 0) * 3600;
+            }
+
+            document.getElementById("speed").textContent =
+              currentSpeed.toFixed(1) + " KM/J";
+
+            // max speed
+            let maxSpeed =
+              parseFloat(document.getElementById("maxSpeed").textContent) || 0;
+
+            if (currentSpeed > maxSpeed) {
+              document.getElementById("maxSpeed").textContent =
+                currentSpeed.toFixed(1) + " KM/J";
+            }
+
+            // =========================
+            // PATH MAP
+            // =========================
+            pathCoords.push(newLatLng);
+            pathLine.setLatLngs(pathCoords);
+          },
+          (err) => {
+            alert("GPS error: " + err.message);
+          },
+          {
+            enableHighAccuracy: true,
+            maximumAge: 1000,
+            timeout: 5000,
+          },
+        );
+      }
+      function stopGPS() {
+        navigator.geolocation.clearWatch(watchId);
+      }
+
+      function getDistanceFromLatLonInM(lat1, lon1, lat2, lon2) {
+        const R = 6371e3;
+        const dLat = ((lat2 - lat1) * Math.PI) / 180;
+        const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos((lat1 * Math.PI) / 180) *
+            Math.cos((lat2 * Math.PI) / 180) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Tracker</title>
+
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: Arial;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+      }
+
+      .card {
+        width: 300px;
+        background: white;
+        padding: 20px;
+        border-radius: 20px;
+      }
+
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+
+        border-radius: 10px;
+        border: 1px solid #ccc;
+
+        box-sizing: border-box;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+
+        margin-top: 10px;
+
+        border: none;
+        border-radius: 10px;
+
+        background: #2a5298;
+        color: white;
+
+        font-weight: bold;
+      }
+
+      p {
+        text-align: center;
+        margin-top: 15px;
+      }
+
+      a {
+        color: blue;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <h2>Login Tracker</h2>
+
+      <input id="email" placeholder="Email" />
+
+      <input id="password" type="password" placeholder="Password" />
+
+      <button onclick="login()">Masuk</button>
+
+      <p>
+        Belum punya akun?
+        <a href="register.html"> Daftar </a>
+      </p>
+    </div>
+
+    <script>
+      function login() {
+        let email = document.getElementById("email").value;
+
+        let password = document.getElementById("password").value;
+
+        if (
+          email == localStorage.getItem("userEmail") &&
+          password == localStorage.getItem("userPassword")
+        ) {
+          localStorage.setItem("isLogin", "true");
+
+          window.location.href = "../index.html";
+        } else {
+          alert("Email atau password salah");
+        }
+      }
+    </script>
+  </body>
+</html>
