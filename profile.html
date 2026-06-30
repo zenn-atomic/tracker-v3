@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Profile</title>
+
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        font-family: Arial;
+      }
+
+      .card {
+        max-width: 500px;
+        margin: auto;
+        background: white;
+        padding: 25px;
+        border-radius: 20px;
+        text-align: center;
+      }
+
+      img {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #2a5298;
+      }
+
+      button {
+        margin-top: 15px;
+        padding: 10px 20px;
+        border: none;
+        background: #2a5298;
+        color: white;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+
+      .box {
+        margin-top: 20px;
+        padding: 15px;
+        background: #eef2ff;
+        border-radius: 12px;
+      }
+
+      h2 {
+        color: #2a5298;
+      }
+
+      a {
+        display: inline-block;
+        margin-top: 20px;
+        text-decoration: none;
+        color: #2a5298;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <h2>Profile</h2>
+
+      <img id="foto" src="img/default-profile.png" />
+
+      <br />
+
+      <input type="file" id="upload" accept="image/*" hidden />
+
+      <button onclick="upload.click()">Ganti Foto</button>
+
+      <div class="box">
+        <h3>Statistik</h3>
+
+        <p>Tempat dikunjungi</p>
+        <h2 id="tempat">0</h2>
+
+        <p>Total Jarak</p>
+        <h2 id="jarak">0 KM</h2>
+      </div>
+
+      <a href="index.html">⬅ Kembali</a>
+    </div>
+
+    <script>
+      const foto = document.getElementById("foto");
+
+      const saved = localStorage.getItem("profilePhoto");
+
+      if (saved) {
+        foto.src = saved;
+      }
+
+      upload.onchange = function (e) {
+        const file = e.target.files[0];
+
+        const reader = new FileReader();
+
+        reader.onload = function () {
+          foto.src = reader.result;
+
+          localStorage.setItem("profilePhoto", reader.result);
+        };
+
+        reader.readAsDataURL(file);
+      };
+
+      const routes = JSON.parse(localStorage.getItem("routes") || "[]");
+
+      // Jumlah perjalanan
+      document.getElementById("tempat").textContent = routes.length;
+
+      // Total jarak semua perjalanan
+      let totalJarak = 0;
+
+      // Total waktu semua perjalanan (opsional)
+      let totalDurasi = 0;
+
+      routes.forEach((route) => {
+        totalJarak += Number(route.distance || 0);
+        totalDurasi += Number(route.duration || 0);
+      });
+
+      document.getElementById("jarak").textContent =
+        totalJarak.toFixed(2) + " KM";
+    </script>
+  </body>
+</html>
