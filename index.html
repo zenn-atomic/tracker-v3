@@ -3,13 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tracker</title>
-
+    <title>Tracker Perjalanan</title>
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
-
     <style>
       * {
         margin: 0;
@@ -17,7 +15,6 @@
         box-sizing: border-box;
         font-family: Arial, sans-serif;
       }
-
       body {
         background: linear-gradient(135deg, #1e3c72, #2a5298);
         padding: 20px;
@@ -90,199 +87,179 @@
         display: none;
       }
 
-      /* APP */
-
       .card {
         max-width: 700px;
         margin: auto;
-        background: white;
+        background: #fff;
         border-radius: 20px;
         padding: 20px;
       }
-
       h1 {
         text-align: center;
         margin-bottom: 15px;
         color: #2a5298;
       }
-
       .box {
         background: #f4f6fa;
         padding: 12px;
         border-radius: 12px;
         margin-bottom: 10px;
       }
-
       .value {
         font-size: 22px;
         font-weight: bold;
       }
-
       #map {
         height: 350px;
         border-radius: 12px;
         margin: 15px 0;
       }
-
       .buttons {
         display: flex;
         gap: 8px;
         flex-wrap: wrap;
       }
-
       button {
         padding: 10px 14px;
         border: none;
         border-radius: 10px;
-        color: white;
+        color: #fff;
         font-weight: bold;
         cursor: pointer;
       }
-
       .start {
         background: #28a745;
       }
-
       .stop {
         background: #dc3545;
       }
-
       .reset {
         background: #007bff;
       }
-
+      .zoom {
+        background: #6f42c1;
+      }
       .routeBtn {
         background: #fd7e14;
         width: 100%;
         margin-top: 5px;
       }
-
+      #routesList {
+        margin-top: 15px;
+      }
       .routeItem {
         background: #eef2ff;
         padding: 10px;
         border-radius: 10px;
         margin-top: 8px;
       }
-
       .header {
+        position: relative;
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
-
-        margin-bottom: 15px;
+        margin-bottom: 20px;
+        height: 60px;
       }
 
-      #profileBtn {
-        width: 50px;
-        height: 50px;
+      .header h1 {
+        margin: 0;
+        color: #2a5298;
+        font-size: 42px;
+      }
 
+      .profileLink {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      #profileImg {
+        width: 55px;
+        height: 55px;
         border-radius: 50%;
-        cursor: pointer;
-
         object-fit: cover;
-
-        border: 3px solid #ffffff;
-
-        box-shadow: 0 0 10px rgba(3, 3, 3, 0.4);
+        border: 3px solid #2a5298;
       }
     </style>
   </head>
-
   <body>
     <!-- SPLASH -->
 
     <div id="loadingScreen">
       <img src="img/logo.png" class="logo" />
-
-      <h2>Tracker</h2>
-
+      <h2>Tracker Perjalanan</h2>
       <div class="loadingBar">
         <div class="loadingFill"></div>
       </div>
     </div>
 
-    <!-- APP -->
+    <!--APP-->
+    <div class="card">
+      <div class="header">
+        <h1>Tracker</h1>
 
-    <div id="mainContent">
-      <div class="card">
-        <div class="header">
-          <h1>Tracker</h1>
-
-          <img
-            id="profileBtn"
-            src="img/default-profile.png"
-            onclick="window.location.href = 'pages/profile.html'"
-          />
-        </div>
-
-        <div class="box">
-          <small>Jarak Tempuh</small>
-          <div class="value" id="distance">0.00 KM</div>
-        </div>
-
-        <div class="box">
-          <small>Kecepatan Saat Ini</small>
-          <div class="value" id="speed">0.0 KM/J</div>
-        </div>
-
-        <div class="box">
-          <small>Kecepatan Maksimum</small>
-          <div class="value" id="maxSpeed">0.0 KM/J</div>
-        </div>
-
-        <div class="box">
-          <small>Waktu Bergerak</small>
-          <div class="value" id="timer">00:00:00</div>
-        </div>
-
-        <div id="map"></div>
-
-        <div class="buttons">
-          <button class="start" onclick="startTracking()">Mulai</button>
-
-          <button class="stop" onclick="stopTracking()">Simpan</button>
-
-          <button class="reset" onclick="resetData()">Reset</button>
-        </div>
-
-        <div id="routesList"></div>
+        <a href="profile.html" class="profileLink">
+          <img id="profileImg" src="img/default-profile.png" />
+        </a>
       </div>
+
+      <div class="box">
+        <small>Jarak Tempuh</small>
+        <div class="value" id="distance">0.00 KM</div>
+      </div>
+      <div class="box">
+        <small>Kecepatan Saat Ini</small>
+        <div class="value" id="speed">0.0 KM/J</div>
+      </div>
+      <div class="box">
+        <small>Kecepatan Maksimum</small>
+        <div class="value" id="maxSpeed">0.0 KM/J</div>
+      </div>
+      <div class="box">
+        <small>Waktu Bergerak</small>
+        <div class="value" id="timer">00:00:00</div>
+      </div>
+
+      <div id="map"></div>
+
+      <div class="buttons">
+        <button class="start" onclick="startTracking()">Mulai</button>
+        <button class="stop" onclick="stopTracking()">Simpan</button>
+        <button class="reset" onclick="resetData()">Reset</button>
+      </div>
+
+      <div id="routesList"></div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <script>
-      /* CEK LOGIN */
+      let watchId = null,
+        tracking = false,
+        totalDistance = 0,
+        lastPosition = null,
+        path = [];
+      let movingSeconds = 0,
+        isMoving = false,
+        maxSpeed = 0;
 
-      document.addEventListener("DOMContentLoaded", () => {
-        if (localStorage.getItem("isLogin") != "true") {
-          window.location.href = "pages/login.html";
-          return;
-        }
+      let startTime = null;
+      let endTime = null;
 
-        /* Splash loading */
-
+      /* Splash loading */ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
           document.getElementById("loadingScreen").style.display = "none";
-
           document.getElementById("mainContent").style.display = "block";
-
           setTimeout(() => {
             map.invalidateSize();
           }, 100);
         }, 3000);
       });
 
-      /* MAP */
-
       const key = "Ztg8csQW79ZcAtBGN9IF";
 
       const map = L.map("map").setView([-7.39, 109.36], 13);
-
-      if (localStorage.getItem("profileImage")) {
-        document.getElementById("profileBtn").src =
-          localStorage.getItem("profileImage");
-      }
 
       L.tileLayer(
         `https://api.maptiler.com/maps/hybrid-v4/{z}/{x}/{y}.jpg?key=${key}`,
@@ -291,195 +268,272 @@
           zoomOffset: -1,
           minZoom: 1,
           maxZoom: 20,
+          crossOrigin: true,
+          attribution: "",
         },
       ).addTo(map);
-      let marker;
-      let pathLine;
-      let pathCoords = [];
-      let lastLat = null;
-      let lastLng = null;
-      let isMoving = false;
-      let movingTimerInterval;
-      let totalDistance = 0;
 
-      pathLine = L.polyline([], { color: "blue" }).addTo(map);
+      let marker = null;
+      let currentRoute = L.polyline([], { weight: 5 }).addTo(map);
 
-      /* Demo */
-
-      let movingSeconds = 0;
-
-      let timerInterval;
-
-      function startTracking() {
-        startGPS();
-
-        movingSeconds = 0;
-        clearInterval(timerInterval);
-        clearInterval(movingTimerInterval);
-
-        movingTimerInterval = setInterval(() => {
-          if (isMoving) {
-            movingSeconds++;
-
-            let h = Math.floor(movingSeconds / 3600);
-            let m = Math.floor((movingSeconds % 3600) / 60);
-            let s = movingSeconds % 60;
-
-            document.getElementById("timer").textContent =
-              String(h).padStart(2, "0") +
-              ":" +
-              String(m).padStart(2, "0") +
-              ":" +
-              String(s).padStart(2, "0");
-          }
-        }, 1000);
-
-        alert("Tracking dimulai");
-      }
-
-      function stopTracking() {
-        stopGPS();
-        let routes = JSON.parse(localStorage.getItem("routes") || "[]");
-
-        routes.push({
-          distance:
-            parseFloat(document.getElementById("distance").textContent) || 0,
-
-          duration: movingSeconds || 0,
-
-          maxSpeed:
-            parseFloat(document.getElementById("maxSpeed").textContent) || 0,
-
-          date: new Date(),
-        });
-
-        localStorage.setItem(
-          "routes",
-
-          JSON.stringify(routes),
+      function formatTime(sec) {
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor((sec % 3600) / 60);
+        const s = sec % 60;
+        return (
+          String(h).padStart(2, "0") +
+          ":" +
+          String(m).padStart(2, "0") +
+          ":" +
+          String(s).padStart(2, "0")
         );
-
-        clearInterval(timerInterval);
-
-        alert("Perjalanan disimpan");
       }
 
-      function resetData() {
-        document.getElementById("distance").textContent = "0.00 KM";
-
-        document.getElementById("speed").textContent = "0.0 KM/J";
-
-        document.getElementById("maxSpeed").textContent = "0.0 KM/J";
-
-        document.getElementById("timer").textContent = "00:00:00";
+      function formatJam(date) {
+        return (
+          String(date.getHours()).padStart(2, "0") +
+          ":" +
+          String(date.getMinutes()).padStart(2, "0")
+        );
       }
-      let watchId;
 
-      function startGPS() {
-        if (!navigator.geolocation) {
-          alert("GPS tidak didukung");
-          return;
+      function formatTanggal(date) {
+        const hari = [
+          "Minggu",
+          "Senin",
+          "Selasa",
+          "Rabu",
+          "Kamis",
+          "Jumat",
+          "Sabtu",
+        ];
+        return (
+          hari[date.getDay()] +
+          ", " +
+          String(date.getDate()).padStart(2, "0") +
+          "-" +
+          String(date.getMonth() + 1).padStart(2, "0") +
+          "-" +
+          date.getFullYear()
+        );
+      }
+
+      setInterval(() => {
+        if (isMoving) {
+          movingSeconds++;
+          document.getElementById("timer").textContent =
+            formatTime(movingSeconds);
         }
+      }, 1000);
+
+      function haversine(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = ((lat2 - lat1) * Math.PI) / 180;
+        const dLon = ((lon2 - lon1) * Math.PI) / 180;
+        const a =
+          Math.sin(dLat / 2) ** 2 +
+          Math.cos((lat1 * Math.PI) / 180) *
+            Math.cos((lat2 * Math.PI) / 180) *
+            Math.sin(dLon / 2) ** 2;
+        return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+
+          map.setView([lat, lon], 17);
+
+          if (marker) {
+            marker.setLatLng([lat, lon]);
+          } else {
+            marker = L.marker([lat, lon]).addTo(map);
+          }
+        },
+        (err) => console.log(err),
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        },
+      );
+      function startTracking() {
+        if (tracking) return;
+        tracking = true;
+
+        startTime = new Date();
+        movingSeconds = 0;
+        totalDistance = 0;
+        maxSpeed = 0;
+        path = [];
+        lastPosition = null;
 
         watchId = navigator.geolocation.watchPosition(
           (pos) => {
-            let lat = pos.coords.latitude;
-            let lng = pos.coords.longitude;
-            let speed = pos.coords.speed; // m/s dari GPS (kalau ada)
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
 
-            let newLatLng = [lat, lng];
+            let speed = (pos.coords.speed || 0) * 3.6;
+            document.getElementById("speed").textContent =
+              speed.toFixed(1) + " KM/J";
 
-            // marker
-            if (!marker) {
-              marker = L.marker(newLatLng).addTo(map);
-              map.setView(newLatLng, 17);
-            } else {
-              marker.setLatLng(newLatLng);
+            if (speed > maxSpeed) {
+              maxSpeed = speed;
+              document.getElementById("maxSpeed").textContent =
+                maxSpeed.toFixed(1) + " KM/J";
             }
 
-            // =========================
-            // 📏 HITUNG JARAK REALTIME
-            // =========================
-            if (lastLat !== null) {
-              let distance = getDistanceFromLatLonInM(
-                lastLat,
-                lastLng,
-                lat,
-                lng,
-              );
+            isMoving = speed > 3;
 
-              // filter noise GPS (biar gak loncat kecil)
-              if (distance > 2) {
-                totalDistance += distance;
+            if (lastPosition) {
+              const d = haversine(lastPosition.lat, lastPosition.lon, lat, lon);
+              if (d > 0.001) {
+                totalDistance += d;
+                document.getElementById("distance").textContent =
+                  totalDistance.toFixed(2) + " KM";
               }
             }
 
-            lastLat = lat;
-            lastLng = lng;
+            lastPosition = { lat, lon };
+            if (path.length > 0) {
+              const last = path[path.length - 1];
 
-            // tampilkan KM
-            document.getElementById("distance").textContent =
-              (totalDistance / 1000).toFixed(2) + " KM";
+              // Tambahkan titik hanya jika berpindah lebih dari ±2 meter
+              const d = haversine(last[0], last[1], lat, lon);
 
-            // =========================
-            // 🚀 SPEED REAL TIME
-            // =========================
-            let currentSpeed = 0;
-
-            if (speed && speed > 0) {
-              currentSpeed = speed * 3.6; // m/s → km/h
-            } else if (lastLat !== null) {
-              // fallback dari pergerakan manual
-              currentSpeed = (distance ? distance / 1000 : 0) * 3600;
+              if (d >= 0.002) {
+                path.push([lat, lon]);
+              }
+            } else {
+              path.push([lat, lon]);
             }
 
-            document.getElementById("speed").textContent =
-              currentSpeed.toFixed(1) + " KM/J";
+            if (marker) marker.setLatLng([lat, lon]);
+            else marker = L.marker([lat, lon]).addTo(map);
 
-            // max speed
-            let maxSpeed =
-              parseFloat(document.getElementById("maxSpeed").textContent) || 0;
-
-            if (currentSpeed > maxSpeed) {
-              document.getElementById("maxSpeed").textContent =
-                currentSpeed.toFixed(1) + " KM/J";
-            }
-
-            // =========================
-            // PATH MAP
-            // =========================
-            pathCoords.push(newLatLng);
-            pathLine.setLatLngs(pathCoords);
+            currentRoute.setLatLngs(path);
+            map.panTo([lat, lon]);
           },
-          (err) => {
-            alert("GPS error: " + err.message);
-          },
-          {
-            enableHighAccuracy: true,
-            maximumAge: 1000,
-            timeout: 5000,
-          },
+          console.error,
+          { enableHighAccuracy: true, maximumAge: 0 },
         );
       }
-      function stopGPS() {
-        navigator.geolocation.clearWatch(watchId);
+
+      function stopTracking() {
+        if (watchId) navigator.geolocation.clearWatch(watchId);
+        tracking = false;
+        isMoving = false;
+
+        endTime = new Date();
+
+        if (path.length > 1) {
+          const routes = JSON.parse(localStorage.getItem("routes") || "[]");
+
+          routes.push({
+            name: "Rute " + (routes.length + 1),
+            tanggal: formatTanggal(startTime),
+            jam: formatJam(startTime) + " - " + formatJam(endTime),
+            path: path,
+            distance: totalDistance,
+            duration: movingSeconds,
+            maxSpeed: maxSpeed,
+          });
+
+          localStorage.setItem("routes", JSON.stringify(routes));
+        }
+
+        tampilkanRiwayat();
       }
 
-      function getDistanceFromLatLonInM(lat1, lon1, lat2, lon2) {
-        const R = 6371e3;
-        const dLat = ((lat2 - lat1) * Math.PI) / 180;
-        const dLon = ((lon2 - lon1) * Math.PI) / 180;
+      function tampilkanRiwayat() {
+        const routes = JSON.parse(localStorage.getItem("routes") || "[]");
+        const list = document.getElementById("routesList");
 
-        const a =
-          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos((lat1 * Math.PI) / 180) *
-            Math.cos((lat2 * Math.PI) / 180) *
-            Math.sin(dLon / 2) *
-            Math.sin(dLon / 2);
+        list.innerHTML = "<h3>🌍 Riwayat Perjalanan</h3>";
 
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        routes.forEach((r, index) => {
+          list.innerHTML += `
+   <div class="routeItem">
+   <b>${r.name}</b><br>
+   <small>${r.tanggal}</small><br>
+   <small>${r.jam}</small><br>
 
-        return R * c;
+   <button class="routeBtn" onclick="lihatRute(${index})">Lihat Rute</button>
+   <button class="routeBtn" style="background:#6f42c1" onclick="editNama(${index})">Edit Nama</button>
+   <button class="routeBtn" style="background:red" onclick="hapusRute(${index})">Hapus</button>
+   </div>
+  `;
+        });
+      }
+
+      function lihatRute(index) {
+        const routes = JSON.parse(localStorage.getItem("routes") || "[]");
+        const r = routes[index];
+        if (!r) return;
+
+        currentRoute.setLatLngs(r.path);
+        map.fitBounds(currentRoute.getBounds());
+
+        // ✅ UPDATE STATISTIK ATAS
+        document.getElementById("distance").textContent =
+          (r.distance || 0).toFixed(2) + " KM";
+        document.getElementById("maxSpeed").textContent =
+          (r.maxSpeed || 0).toFixed(1) + " KM/J";
+        document.getElementById("timer").textContent = formatTime(
+          r.duration || 0,
+        );
+        document.getElementById("speed").textContent = "0.0 KM/J";
+      }
+
+      function editNama(index) {
+        let routes = JSON.parse(localStorage.getItem("routes") || "[]");
+        let namaBaru = prompt("Nama baru:", routes[index].name);
+
+        if (namaBaru) {
+          routes[index].name = namaBaru;
+          localStorage.setItem("routes", JSON.stringify(routes));
+          tampilkanRiwayat();
+        }
+      }
+
+      function hapusRute(index) {
+        let routes = JSON.parse(localStorage.getItem("routes") || "[]");
+
+        if (confirm("Hapus?")) {
+          routes.splice(index, 1);
+          localStorage.setItem("routes", JSON.stringify(routes));
+          tampilkanRiwayat();
+        }
+      }
+
+      function lihatSemuaRute() {
+        if (path.length > 0) {
+          map.fitBounds(currentRoute.getBounds());
+        }
+      }
+
+      function resetData() {
+        totalDistance = 0;
+        lastPosition = null;
+        path = [];
+        movingSeconds = 0;
+        maxSpeed = 0;
+
+        currentRoute.setLatLngs([]);
+
+        document.getElementById("distance").textContent = "0.00 KM";
+        document.getElementById("speed").textContent = "0.0 KM/J";
+        document.getElementById("maxSpeed").textContent = "0.0 KM/J";
+        document.getElementById("timer").textContent = "00:00:00";
+      }
+
+      tampilkanRiwayat();
+
+      const savedPhoto = localStorage.getItem("profilePhoto");
+
+      if (savedPhoto) {
+        document.getElementById("profileImg").src = savedPhoto;
       }
     </script>
   </body>
